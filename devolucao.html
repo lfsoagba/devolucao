@@ -42,7 +42,7 @@
       border-top:1px solid #9ba79b;
     }
 
-    /* Layout vertical para produtos */
+    /* Layout vertical para blocos de produtos */
     .produto-linha {
       display: flex;
       flex-direction: column;
@@ -134,7 +134,6 @@
         <label>Total:</label>
         <input type="text" placeholder="Total" readonly>
 
-        <button type="button" onclick="calcularTotal(this)">Calcular total</button>
         <button type="button" onclick="removerLinha(this)">Remover produto</button>
       `;
 
@@ -149,19 +148,18 @@
       botao.closest('.produto-linha').remove();
     }
 
-    function calcularTotal(botao) {
-      const linha = botao.closest('.produto-linha');
-      const qtd = parseFloat(linha.querySelectorAll("input")[1].value) || 0;
-      const por = parseFloat(linha.querySelectorAll("input")[2].value) || 0;
-      const un = linha.querySelector("select").value;
-      const total = qtd * por;
-      linha.querySelectorAll("input")[3].value = total ? `${total}${un}` : "";
-    }
-
+    /* Cálculo automático */
     document.addEventListener('input', (e) => {
       const linha = e.target.closest('.produto-linha');
       if (!linha) return;
-      calcularTotal({ closest: () => linha });
+
+      const inputs = linha.querySelectorAll("input");
+      const qtd = parseFloat(inputs[1].value) || 0;
+      const por = parseFloat(inputs[2].value) || 0;
+      const un = linha.querySelector("select").value;
+
+      const total = qtd * por;
+      inputs[3].value = total ? `${total}${un}` : "";
     });
 
     function toggleNaoUtilizados() {
@@ -223,7 +221,7 @@
       const naoUtil = coletarProdutos('listaNaoUtilizados');
 
       if (devolvidos.length > 0) {
-        doc.text('Produtos devolvidos:', 14, y);
+        doc.text('Embalagens devolvidas:', 14, y);
         doc.autoTable({
           startY: y + 4,
           head: [['Produto','Qtd. Emb.','Por Emb.','Unidade','Total']],
@@ -235,7 +233,7 @@
       }
 
       if (naoUtil.length > 0) {
-        doc.text('Produtos não utilizados:', 14, y);
+        doc.text('Produtos devolvidos (embalagens cheias):', 14, y);
         doc.autoTable({
           startY: y + 4,
           head: [['Produto','Qtd. Emb.','Por Emb.','Unidade','Total']],

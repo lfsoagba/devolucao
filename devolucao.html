@@ -53,7 +53,7 @@
       margin-top: 15px;
     }
 
-    button, .btn-pequeno {
+    button {
       margin-top:10px; padding:12px;
       background-color:#6b7b6b; color:white;
       border:none; border-radius:8px; cursor:pointer;
@@ -86,16 +86,16 @@
       <option>Não</option>
     </select>
 
-    <!-- PRODUTOS DEVOLVIDOS (VERTICAL) -->
+    <!-- EMBALAGENS DEVOLVIDAS -->
     <div class="secao">
-      <h3>Produtos devolvidos</h3>
+      <h3>Embalagens devolvidas</h3>
       <div id="listaDevolvidos"></div>
-      <button type="button" onclick="adicionarProduto('listaDevolvidos')">Adicionar produto</button>
+      <button type="button" onclick="adicionarProduto('listaDevolvidos')">Adicionar embalagem</button>
     </div>
 
-    <!-- PRODUTOS NÃO UTILIZADOS (VERTICAL) -->
+    <!-- PRODUTOS DEVOLVIDOS / NÃO UTILIZADOS -->
     <div class="secao" id="secaoNaoUtilizados" style="display:none;">
-      <h3>Produtos não utilizados</h3>
+      <h3>Produtos devolvidos/não utilizados</h3>
       <div id="listaNaoUtilizados"></div>
       <button type="button" onclick="adicionarProduto('listaNaoUtilizados')">Adicionar produto</button>
     </div>
@@ -108,7 +108,7 @@
   </form>
 
   <script>
-    /* Criar linha vertical de produtos */
+    /* Criar linha vertical */
     function criarLinhaProduto(containerId) {
       const container = document.getElementById(containerId);
 
@@ -116,8 +116,8 @@
       linha.className = 'produto-linha';
 
       linha.innerHTML = `
-        <label>Produto:</label>
-        <input type="text" placeholder="Produto" required>
+        <label>Produto / Embalagem:</label>
+        <input type="text" placeholder="Nome" required>
 
         <label>Qtd. Embalagens:</label>
         <input type="number" placeholder="Qtd. Emb." min="0" required>
@@ -134,7 +134,7 @@
         <label>Total:</label>
         <input type="text" placeholder="Total" readonly>
 
-        <button type="button" onclick="removerLinha(this)">Remover produto</button>
+        <button type="button" onclick="removerLinha(this)">Remover</button>
       `;
 
       container.appendChild(linha);
@@ -217,27 +217,27 @@
           .filter(r => r.some(v => v !== ""));
       }
 
-      const devolvidos = coletarProdutos('listaDevolvidos');
-      const naoUtil = coletarProdutos('listaNaoUtilizados');
+      const embalagens = coletarProdutos('listaDevolvidos');
+      const produtosNao = coletarProdutos('listaNaoUtilizados');
 
-      if (devolvidos.length > 0) {
+      if (embalagens.length > 0) {
         doc.text('Embalagens devolvidas:', 14, y);
         doc.autoTable({
           startY: y + 4,
-          head: [['Produto','Qtd. Emb.','Por Emb.','Unidade','Total']],
-          body: devolvidos,
+          head: [['Nome','Qtd. Emb.','Por Emb.','Unidade','Total']],
+          body: embalagens,
           theme: 'grid',
           styles: { fontSize: 10 }
         });
         y = doc.lastAutoTable.finalY + 10;
       }
 
-      if (naoUtil.length > 0) {
-        doc.text('Produtos devolvidos (embalagens cheias):', 14, y);
+      if (produtosNao.length > 0) {
+        doc.text('Produtos devolvidos/não utilizados:', 14, y);
         doc.autoTable({
           startY: y + 4,
-          head: [['Produto','Qtd. Emb.','Por Emb.','Unidade','Total']],
-          body: naoUtil,
+          head: [['Nome','Qtd. Emb.','Por Emb.','Unidade','Total']],
+          body: produtosNao,
           theme: 'grid',
           styles: { fontSize: 10 }
         });

@@ -73,6 +73,10 @@
 
   <form id="formDevolucao">
 
+    <!-- NOVO CAMPO -->
+    <label for="responsavel">Responsável técnico que está recebendo a devolução:</label>
+    <input type="text" id="responsavel" name="responsavel" placeholder="Nome completo" required>
+
     <label for="data">Data de devolução:</label>
     <input type="date" id="data" name="data" required>
 
@@ -158,6 +162,7 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('p','mm','a4');
 
+      const responsavel = document.getElementById('responsavel').value;
       const data = document.getElementById('data').value;
       const os = document.getElementById('os').value;
       const observacoes = document.getElementById('observacoes').value;
@@ -166,6 +171,7 @@
       doc.text('Relatório de Devolução de Embalagens', 14, 16);
 
       const info = [
+        ['Responsável técnico', responsavel],
         ['Data de devolução', data],
         ['OS(s)', os]
       ];
@@ -227,10 +233,10 @@
 
       /* ASSINATURAS */
       doc.setFontSize(12);
-
       const linhaY = y + 20;
-      doc.line(20, linhaY, 90, linhaY);   // linha esquerda
-      doc.line(120, linhaY, 190, linhaY); // linha direita
+
+      doc.line(20, linhaY, 90, linhaY);
+      doc.line(120, linhaY, 190, linhaY);
 
       doc.text("Responsável técnico", 32, linhaY + 6);
       doc.text("Prestador", 145, linhaY + 6);

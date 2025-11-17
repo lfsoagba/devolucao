@@ -30,27 +30,11 @@
     }
     label { display:block; margin-top:10px; }
     select, input[type="date"], input[type="text"], input[type="number"], textarea {
-      width:100%; padding:6px; margin-top:5px;
+      width:100%; padding:10px; margin-top:5px;
       border:1px solid #9ba79b; border-radius:5px; background:#f8f9f7;
+      font-size:16px;
     }
     textarea { resize:vertical; min-height:60px; }
-
-    .produto-header {
-      display:grid;
-      grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;
-      gap:10px;
-      font-weight:bold;
-      margin-top:15px;
-      align-items:center;
-    }
-
-    .produto-linha {
-      display:grid;
-      grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;
-      gap:10px;
-      margin-top:10px;
-      align-items:center;
-    }
 
     .secao {
       margin-top:25px;
@@ -58,65 +42,29 @@
       border-top:1px solid #9ba79b;
     }
 
+    /* Layout vertical para produtos */
+    .produto-linha {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #eef1eb;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
     button, .btn-pequeno {
-      margin-top:10px;
-      padding:8px 15px;
-      background-color:#6b7b6b;
-      color:white;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
+      margin-top:10px; padding:12px;
+      background-color:#6b7b6b; color:white;
+      border:none; border-radius:8px; cursor:pointer;
+      width:100%; font-size:16px;
     }
+    button:hover { background-color:#5a695a; }
 
-    .btn-pequeno {
-      padding:5px 10px;
-      font-size:16px;
-      font-weight:bold;
-    }
-
-    button:hover, .btn-pequeno:hover {
-      background-color:#5a695a;
-    }
-
-    /* ---------------------------
-       RESPONSIVIDADE MOBILE
-       ---------------------------*/
     @media (max-width:480px){
-
-      body { margin: 15px; font-size: 16px; }
-      h1 { font-size: 20px; }
-
-      form { padding: 15px; }
-
-      label { font-size: 15px; }
-
-      select, input, textarea {
-        font-size: 16px;
-        padding: 10px;
-      }
-
-      .produto-header,
-      .produto-linha {
-        grid-template-columns: 1fr;
-      }
-
-      .produto-linha input,
-      .produto-linha select {
-        width:100%;
-      }
-
-      .produto-linha div {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-      }
-
-      button, .btn-pequeno {
-        width:100%;
-        padding: 12px;
-        font-size:17px;
-        border-radius:8px;
-      }
+      body { margin:15px; font-size:16px; }
+      h1 { font-size:20px; }
+      form { padding:15px; }
     }
   </style>
 </head>
@@ -138,26 +86,18 @@
       <option>Não</option>
     </select>
 
-    <!-- LISTA DE PRODUTOS DEVOLVIDOS -->
-    <div class="secao" id="secaoDevolvidos">
+    <!-- PRODUTOS DEVOLVIDOS (VERTICAL) -->
+    <div class="secao">
       <h3>Produtos devolvidos</h3>
-      <div class="produto-header">
-        <span>Produto</span><span>Qtd. Emb.</span><span>Por Emb.</span>
-        <span>Unidade</span><span>Total</span><span></span>
-      </div>
       <div id="listaDevolvidos"></div>
-      <button type="button" class="btn-pequeno" onclick="adicionarProduto('listaDevolvidos')">+</button>
+      <button type="button" onclick="adicionarProduto('listaDevolvidos')">Adicionar produto</button>
     </div>
 
-    <!-- PRODUTOS NÃO UTILIZADOS -->
+    <!-- PRODUTOS NÃO UTILIZADOS (VERTICAL) -->
     <div class="secao" id="secaoNaoUtilizados" style="display:none;">
       <h3>Produtos não utilizados</h3>
-      <div class="produto-header">
-        <span>Produto</span><span>Qtd. Emb.</span><span>Por Emb.</span>
-        <span>Unidade</span><span>Total</span><span></span>
-      </div>
       <div id="listaNaoUtilizados"></div>
-      <button type="button" class="btn-pequeno" onclick="adicionarProduto('listaNaoUtilizados')">+</button>
+      <button type="button" onclick="adicionarProduto('listaNaoUtilizados')">Adicionar produto</button>
     </div>
 
     <label for="observacoes">Observações (opcional):</label>
@@ -168,28 +108,36 @@
   </form>
 
   <script>
-    /* --------------------------
-       PRODUTOS
-       --------------------------*/
+    /* Criar linha vertical de produtos */
     function criarLinhaProduto(containerId) {
       const container = document.getElementById(containerId);
 
       const linha = document.createElement('div');
       linha.className = 'produto-linha';
+
       linha.innerHTML = `
+        <label>Produto:</label>
         <input type="text" placeholder="Produto" required>
+
+        <label>Qtd. Embalagens:</label>
         <input type="number" placeholder="Qtd. Emb." min="0" required>
+
+        <label>Quantidade por embalagem:</label>
         <input type="number" placeholder="Por Emb." min="0" required>
+
+        <label>Unidade:</label>
         <select required>
           <option value="L">L</option>
           <option value="kg">kg</option>
         </select>
+
+        <label>Total:</label>
         <input type="text" placeholder="Total" readonly>
-        <div style="display:flex;gap:6px">
-          <button type="button" class="btn-pequeno" onclick="calcularTotal(this)">=</button>
-          <button type="button" class="btn-pequeno" onclick="removerLinha(this)">−</button>
-        </div>
+
+        <button type="button" onclick="calcularTotal(this)">Calcular total</button>
+        <button type="button" onclick="removerLinha(this)">Remover produto</button>
       `;
+
       container.appendChild(linha);
     }
 
@@ -203,11 +151,11 @@
 
     function calcularTotal(botao) {
       const linha = botao.closest('.produto-linha');
-      const qtd = parseFloat(linha.children[1].value) || 0;
-      const por = parseFloat(linha.children[2].value) || 0;
-      const un = linha.children[3].value;
+      const qtd = parseFloat(linha.querySelectorAll("input")[1].value) || 0;
+      const por = parseFloat(linha.querySelectorAll("input")[2].value) || 0;
+      const un = linha.querySelector("select").value;
       const total = qtd * por;
-      linha.children[4].value = total ? `${total}${un}` : "";
+      linha.querySelectorAll("input")[3].value = total ? `${total}${un}` : "";
     }
 
     document.addEventListener('input', (e) => {
@@ -229,9 +177,7 @@
       }
     }
 
-    /* --------------------------
-       PDF
-       --------------------------*/
+    /* PDF */
     function gerarPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('p','mm','a4');
@@ -264,11 +210,11 @@
       function coletarProdutos(id) {
         return Array.from(document.querySelectorAll(`#${id} .produto-linha`))
           .map(l => [
-            l.children[0].value,
-            l.children[1].value,
-            l.children[2].value,
-            l.children[3].value,
-            l.children[4].value
+            l.querySelectorAll("input")[0].value,
+            l.querySelectorAll("input")[1].value,
+            l.querySelectorAll("input")[2].value,
+            l.querySelector("select").value,
+            l.querySelectorAll("input")[3].value
           ])
           .filter(r => r.some(v => v !== ""));
       }
@@ -277,8 +223,9 @@
       const naoUtil = coletarProdutos('listaNaoUtilizados');
 
       if (devolvidos.length > 0) {
+        doc.text('Produtos devolvidos:', 14, y);
         doc.autoTable({
-          startY: y,
+          startY: y + 4,
           head: [['Produto','Qtd. Emb.','Por Emb.','Unidade','Total']],
           body: devolvidos,
           theme: 'grid',

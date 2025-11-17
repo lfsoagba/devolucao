@@ -42,7 +42,7 @@
       border-top:1px solid #9ba79b;
     }
 
-    /* Layout vertical para blocos de produtos */
+    /* Layout vertical para blocos */
     .produto-linha {
       display: flex;
       flex-direction: column;
@@ -79,13 +79,6 @@
     <label for="os">Número da(s) OS(s):</label>
     <input type="text" id="os" name="os" placeholder="Ex: 1023, 1044..." required>
 
-    <label for="utilizou">Utilizou todos os produtos?</label>
-    <select id="utilizou" name="utilizou" onchange="toggleNaoUtilizados()" required>
-      <option value="">Selecione</option>
-      <option>Sim</option>
-      <option>Não</option>
-    </select>
-
     <!-- EMBALAGENS DEVOLVIDAS -->
     <div class="secao">
       <h3>Embalagens devolvidas</h3>
@@ -94,7 +87,7 @@
     </div>
 
     <!-- PRODUTOS DEVOLVIDOS / NÃO UTILIZADOS -->
-    <div class="secao" id="secaoNaoUtilizados" style="display:none;">
+    <div class="secao">
       <h3>Produtos devolvidos/não utilizados</h3>
       <div id="listaNaoUtilizados"></div>
       <button type="button" onclick="adicionarProduto('listaNaoUtilizados')">Adicionar produto</button>
@@ -111,7 +104,6 @@
     /* Criar linha vertical */
     function criarLinhaProduto(containerId) {
       const container = document.getElementById(containerId);
-
       const linha = document.createElement('div');
       linha.className = 'produto-linha';
 
@@ -136,7 +128,6 @@
 
         <button type="button" onclick="removerLinha(this)">Remover</button>
       `;
-
       container.appendChild(linha);
     }
 
@@ -162,19 +153,6 @@
       inputs[3].value = total ? `${total}${un}` : "";
     });
 
-    function toggleNaoUtilizados() {
-      const secao = document.getElementById('secaoNaoUtilizados');
-      if (document.getElementById('utilizou').value === 'Não') {
-        secao.style.display = 'block';
-        if (!document.getElementById('listaNaoUtilizados').hasChildNodes()) {
-          criarLinhaProduto('listaNaoUtilizados');
-        }
-      } else {
-        secao.style.display = 'none';
-        document.getElementById('listaNaoUtilizados').innerHTML = '';
-      }
-    }
-
     /* PDF */
     function gerarPDF() {
       const { jsPDF } = window.jspdf;
@@ -182,7 +160,6 @@
 
       const data = document.getElementById('data').value;
       const os = document.getElementById('os').value;
-      const utilizou = document.getElementById('utilizou').value;
       const observacoes = document.getElementById('observacoes').value;
 
       doc.setFontSize(14);
@@ -190,8 +167,7 @@
 
       const info = [
         ['Data de devolução', data],
-        ['OS(s)', os],
-        ['Utilizou todos os produtos?', utilizou]
+        ['OS(s)', os]
       ];
 
       doc.autoTable({
@@ -206,15 +182,13 @@
       let y = doc.lastAutoTable.finalY + 10;
 
       function coletarProdutos(id) {
-        return Array.from(document.querySelectorAll(`#${id} .produto-linha`))
-          .map(l => [
-            l.querySelectorAll("input")[0].value,
-            l.querySelectorAll("input")[1].value,
-            l.querySelectorAll("input")[2].value,
-            l.querySelector("select").value,
-            l.querySelectorAll("input")[3].value
-          ])
-          .filter(r => r.some(v => v !== ""));
+        return Array.from(document.querySelectorAll(`#${id} .produto-linha`)).map(l => [
+          l.querySelectorAll("input")[0].value,
+          l.querySelectorAll("input")[1].value,
+          l.querySelectorAll("input")[2].value,
+          l.querySelector("select").value,
+          l.querySelectorAll("input")[3].value
+        ]).filter(r => r.some(v => v !== ""));
       }
 
       const embalagens = coletarProdutos('listaDevolvidos');
@@ -248,13 +222,25 @@
         doc.text('Observações:', 14, y);
         doc.setFontSize(10);
         doc.text(doc.splitTextToSize(observacoes, 180), 14, y + 6);
+        y += 12;
       }
+
+      /* ASSINATURAS */
+      doc.setFontSize(12);
+
+      const linhaY = y + 20;
+      doc.line(20, linhaY, 90, linhaY);   // linha esquerda
+      doc.line(120, linhaY, 190, linhaY); // linha direita
+
+      doc.text("Responsável técnico", 32, linhaY + 6);
+      doc.text("Prestador", 145, linhaY + 6);
 
       doc.save(`Devolucao_${os}_${data}.pdf`);
     }
 
     window.onload = () => {
       criarLinhaProduto('listaDevolvidos');
+      criarLinhaProduto('listaNaoUtilizados');
     }
   </script>
 
